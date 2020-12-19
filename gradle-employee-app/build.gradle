@@ -1,0 +1,66 @@
+import groovy.sql.Sql
+plugins {
+    id 'application'
+}
+configurations {
+    sqllite
+}
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+version = '1.0' 
+apply plugin: 'application'
+mainClassName = 'EmployeeApp'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',  
+        	'Implementation-Version': version,
+        	'Main-Class': 'EmployeeApp'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+
+
+println 'This is executed during configuration phase'
+
+task configured {
+    println 'The project is configured'
+}
+
+wrapper {
+    gradleVersion = '5.3.1'
+}
+
+repositories {
+	mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
+    testImplementation('junit:junit:4.13')
+    testRuntime('junit:junit:4.13')
+	compile 'ch.qos.logback:logback-classic:1.1.2'
+	compile 'com.googlecode.json-simple:json-simple:1.1.1'
+	compile group:'org.xerial', name:'sqlite-jdbc', version:'3.8.11.2'
+	  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+	
+}
+
+
+test {
+    useJUnit()
+	useJUnitPlatform()
+}
+
